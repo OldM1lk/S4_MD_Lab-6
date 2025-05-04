@@ -32,8 +32,6 @@ class MainActivity : ComponentActivity() {
 
                     when {
                         state.status.isGranted -> ImagesScreen(
-                            imageUris = emptyList(),
-                            onImageClick = {  },
                             modifier = Modifier.padding(
                                 innerPadding
                             )
