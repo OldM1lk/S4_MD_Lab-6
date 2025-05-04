@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,37 +21,38 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             Lab_6Theme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    RequiredPermission(
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
-        }
-    }
-}
+                    val state = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
 
-@Composable
-@OptIn(ExperimentalPermissionsApi::class)
-fun RequiredPermission(modifier: Modifier = Modifier) {
-    val state = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
-    when {
-        state.status.isGranted -> ImagesScreen(modifier)
-        else -> {
-            LaunchedEffect(Unit) {
-                state.launchPermissionRequest()
-            }
-            Column(
-                modifier = modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text("Что вы наделали...")
+                    when {
+                        state.status.isGranted -> ImagesScreen(
+                            imageUris = emptyList(),
+                            onImageClick = {  },
+                            modifier = Modifier.padding(
+                                innerPadding
+                            )
+                        )
+
+                        else -> {
+                            LaunchedEffect(Unit) {
+                                state.launchPermissionRequest()
+                            }
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text("Что вы наделали...")
+                            }
+                        }
+                    }
+                }
             }
         }
     }
