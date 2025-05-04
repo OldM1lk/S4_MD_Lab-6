@@ -1,17 +1,25 @@
 package com.example.lab_6
 
+import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.example.lab_6.ui.screens.images.ImagesScreen
 import com.example.lab_6.ui.theme.Lab_6Theme
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,8 +28,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             Lab_6Theme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                    RequiredPermission(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -31,9 +38,22 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+@OptIn(ExperimentalPermissionsApi::class)
+fun RequiredPermission(modifier: Modifier = Modifier) {
+    val state = rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES)
+    when {
+        state.status.isGranted -> ImagesScreen(modifier)
+        else -> {
+            LaunchedEffect(Unit) {
+                state.launchPermissionRequest()
+            }
+            Column(
+                modifier = modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text("Что вы наделали...")
+            }
+        }
+    }
 }
