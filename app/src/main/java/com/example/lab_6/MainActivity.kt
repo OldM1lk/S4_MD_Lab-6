@@ -53,7 +53,6 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable<GalleryScreen> {
-                            galleryViewModel.loadImages()
                             GalleryScreen(
                                 navController = navController,
                                 state = imageState,

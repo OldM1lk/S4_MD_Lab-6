@@ -24,6 +24,10 @@ class GalleryViewModel(
     private val _state = MutableStateFlow(ImageState())
     val state = _state.asStateFlow()
 
+    init {
+        loadImages()
+    }
+
     fun onEvent(event: ImageEvent) {
         when (event) {
             ImageEvent.HideDialog -> {
