@@ -3,14 +3,13 @@ package com.example.lab_6.ui.screens.gallery
 import android.app.Application
 import android.content.ContentUris
 import android.provider.MediaStore
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lab_6.data.local.Image
-import com.example.lab_6.db.ImageDao
 import com.example.lab_6.data.local.ImageEvent
 import com.example.lab_6.data.local.ImageState
 import com.example.lab_6.data.sdk29AndUp
+import com.example.lab_6.db.ImageDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +24,6 @@ class GalleryViewModel(
     val state = _state.asStateFlow()
 
     private val _images = MutableStateFlow<List<Image>>(emptyList())
-    val images = _images.asStateFlow()
 
     fun onEvent(event: ImageEvent) {
         when (event) {
@@ -40,6 +38,7 @@ class GalleryViewModel(
             ImageEvent.SaveImageDescription -> {
                 val id = state.value.id
                 val description = state.value.description
+                val uri = state.value.uri.toString()
 
                 if (description.isBlank()) {
                     return
@@ -48,7 +47,7 @@ class GalleryViewModel(
                 val image = Image(
                     id = id,
                     description = description,
-                    uri = state.value.uri
+                    uri = uri
                 )
                 viewModelScope.launch {
                     dao.upsertImage(image)
@@ -85,6 +84,14 @@ class GalleryViewModel(
                 }
             }
 
+            is ImageEvent.SetImages -> {
+                _state.update {
+                    it.copy(
+                        images = event.images
+                    )
+                }
+            }
+
             ImageEvent.ShowDialog -> {
                 _state.update {
                     it.copy(
@@ -98,6 +105,7 @@ class GalleryViewModel(
 
     init {
         loadImages()
+
     }
 
     private fun loadImages() {
@@ -133,13 +141,18 @@ class GalleryViewModel(
                     photos.add(
                         Image(
                             id = id,
-                            uri = uri
+                            uri = uri.toString()
                         )
                     )
-                    Log.d("TAG", "$id")
                 }
             }
             _images.value = photos
+
+            _state.update {
+                it.copy(
+                    images = photos
+                )
+            }
         }
     }
 }

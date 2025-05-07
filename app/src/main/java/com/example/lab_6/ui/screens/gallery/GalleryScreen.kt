@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import coil3.compose.AsyncImage
 import com.example.lab_6.data.local.ImageEvent
 import com.example.lab_6.data.local.ImageState
@@ -39,7 +40,7 @@ fun GalleryScreen(
     ) {
         items(state.images) { image ->
             AsyncImage(
-                model = image.uri,
+                model = image.uri.toUri(),
                 contentDescription = image.description,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -47,6 +48,8 @@ fun GalleryScreen(
                         onClick = { },
                         onLongClick = {
                             onEvent(ImageEvent.ShowDialog)
+                            onEvent(ImageEvent.SetId(image.id))
+                            onEvent(ImageEvent.SetUri(image.uri.toUri()))
                         }
                     ),
                 contentScale = ContentScale.Crop
