@@ -15,7 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.example.lab_6.DetailScreen
 import com.example.lab_6.data.local.ImageEvent
 import com.example.lab_6.data.local.ImageState
 import com.example.lab_6.ui.screens.AddDescriptionDialog
@@ -23,6 +25,7 @@ import com.example.lab_6.ui.screens.AddDescriptionDialog
 @Composable
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 fun GalleryScreen(
+    navController: NavController,
     state: ImageState,
     onEvent: (ImageEvent) -> Unit,
     modifier: Modifier = Modifier
@@ -45,7 +48,15 @@ fun GalleryScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .combinedClickable(
-                        onClick = { },
+                        onClick = {
+                            navController.navigate(
+                                DetailScreen(
+                                    id = image.id,
+                                    description = image.description,
+                                    uri = image.uri
+                                )
+                            )
+                        },
                         onLongClick = {
                             onEvent(ImageEvent.ShowDialog(image))
                         }

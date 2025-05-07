@@ -63,7 +63,7 @@ class GalleryViewModel(
             is ImageEvent.SetDescription -> {
                 _state.update {
                     it.copy(
-                        description = event.description
+                        description = event.description,
                     )
                 }
             }
@@ -121,6 +121,7 @@ class GalleryViewModel(
 
                 while (cursor.moveToNext()) {
                     val id = cursor.getLong(idColumn)
+                    val description = dao.getImageById(id)?.description
                     val uri = ContentUris.withAppendedId(
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                         id
@@ -128,6 +129,7 @@ class GalleryViewModel(
                     photos.add(
                         Image(
                             id = id,
+                            description = description,
                             uri = uri.toString()
                         )
                     )
