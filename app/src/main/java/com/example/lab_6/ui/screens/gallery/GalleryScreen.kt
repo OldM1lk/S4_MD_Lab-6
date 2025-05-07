@@ -47,9 +47,7 @@ fun GalleryScreen(
                     .combinedClickable(
                         onClick = { },
                         onLongClick = {
-                            onEvent(ImageEvent.ShowDialog)
-                            onEvent(ImageEvent.SetId(image.id))
-                            onEvent(ImageEvent.SetUri(image.uri.toUri()))
+                            onEvent(ImageEvent.ShowDialog(image))
                         }
                     ),
                 contentScale = ContentScale.Crop

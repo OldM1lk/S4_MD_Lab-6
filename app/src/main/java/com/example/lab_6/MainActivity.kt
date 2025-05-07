@@ -39,6 +39,7 @@ class MainActivity : ComponentActivity() {
 
                     when {
                         permissionState.status.isGranted -> {
+                            galleryViewModel.loadImages()
                             GalleryScreen(
                                 state = imageState,
                                 onEvent = galleryViewModel::onEvent,

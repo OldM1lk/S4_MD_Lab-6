@@ -3,6 +3,7 @@ package com.example.lab_6.ui.screens.gallery
 import android.app.Application
 import android.content.ContentUris
 import android.provider.MediaStore
+import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lab_6.data.local.Image
@@ -23,14 +24,13 @@ class GalleryViewModel(
     private val _state = MutableStateFlow(ImageState())
     val state = _state.asStateFlow()
 
-    private val _images = MutableStateFlow<List<Image>>(emptyList())
-
     fun onEvent(event: ImageEvent) {
         when (event) {
             ImageEvent.HideDialog -> {
                 _state.update {
                     it.copy(
-                        isAddingDescription = false
+                        isAddingDescription = false,
+                        description = ""
                     )
                 }
             }
@@ -49,21 +49,13 @@ class GalleryViewModel(
                     description = description,
                     uri = uri
                 )
-                viewModelScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     dao.upsertImage(image)
                 }
                 _state.update {
                     it.copy(
                         isAddingDescription = false,
                         description = ""
-                    )
-                }
-            }
-
-            is ImageEvent.SetId -> {
-                _state.update {
-                    it.copy(
-                        id = event.id
                     )
                 }
             }
@@ -76,14 +68,6 @@ class GalleryViewModel(
                 }
             }
 
-            is ImageEvent.SetUri -> {
-                _state.update {
-                    it.copy(
-                        uri = event.uri
-                    )
-                }
-            }
-
             is ImageEvent.SetImages -> {
                 _state.update {
                     it.copy(
@@ -92,23 +76,26 @@ class GalleryViewModel(
                 }
             }
 
-            ImageEvent.ShowDialog -> {
-                _state.update {
-                    it.copy(
-                        isAddingDescription = true
-                    )
+            is ImageEvent.ShowDialog -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    val image = dao.getImageById(event.image.id)
+                    val description = image?.description ?: ""
+
+                    _state.update {
+                        it.copy(
+                            isAddingDescription = true,
+                            id = event.image.id,
+                            uri = event.image.uri.toUri(),
+                            description = description
+                        )
+                    }
                 }
             }
         }
 
     }
 
-    init {
-        loadImages()
-
-    }
-
-    private fun loadImages() {
+    fun loadImages() {
         viewModelScope.launch(Dispatchers.IO) {
             val collection = sdk29AndUp {
                 MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
@@ -146,7 +133,6 @@ class GalleryViewModel(
                     )
                 }
             }
-            _images.value = photos
 
             _state.update {
                 it.copy(
