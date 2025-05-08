@@ -51,7 +51,6 @@ fun GalleryScreen(
                         onClick = {
                             navController.navigate(
                                 DetailScreen(
-                                    id = image.id,
                                     description = image.description,
                                     uri = image.uri
                                 )

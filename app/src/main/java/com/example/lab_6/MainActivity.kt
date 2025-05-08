@@ -83,7 +83,6 @@ object GalleryScreen
 
 @Serializable
 data class DetailScreen(
-    val id: Long,
     val description: String?,
     val uri: String
 )
